@@ -1,7 +1,8 @@
 from PyQt5.QtWidgets import QCheckBox, QWidget
+import matplotlib.pyplot as plt
 from sklearn.datasets import fetch_olivetti_faces
-from sklearn.model_selection import train_test_split
 from feature_selection import *
+from graphics import show_features, show_features_progress
 
 
 class Main(QWidget):
@@ -27,9 +28,17 @@ class Main(QWidget):
         target = data_images['target']
         classes = np.unique(target)[-1]
         self.isdatasetloaded.setChecked(True)
-
-        train_idx, test_idx = train_test_split(np.arange(len(images)), test_size=0.25)
-        train_images, train_target = images[train_idx], target[train_idx]
-        test_images, test_target = images[test_idx], target[test_idx]
-
+        show_features(images[0])
         functions = [histogram, dft, dct, mean_pooling, gradient]
+
+        fig, axs = show_features_progress()
+        rez = []
+        for k in range(10):
+            rez.append(k/10)
+            for i in range(2):
+                for j in range(3):
+                    axs[i, j].plot(rez.pop())
+                    fig.show()
+            plt.pause(0.05)
+        #fig.show()
+        print('11')
