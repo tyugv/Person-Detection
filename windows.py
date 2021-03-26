@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QCheckBox, QWidget
 from sklearn.datasets import fetch_olivetti_faces
 from sklearn.model_selection import train_test_split
+from feature_selection import *
 
 
 class Main(QWidget):
@@ -31,3 +32,4 @@ class Main(QWidget):
         train_images, train_target = images[train_idx], target[train_idx]
         test_images, test_target = images[test_idx], target[test_idx]
 
+        functions = [histogram, dft, dct, mean_pooling, gradient]
