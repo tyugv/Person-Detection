@@ -4,7 +4,7 @@ import numpy as np
 from numpy.lib.stride_tricks import as_strided
 
 
-def mean_pooling(A, kernel_size, stride=None, padding=0):
+def mean_pooling(A, kernel_size=4, stride=None, padding=0):
     if stride is None:
         stride = kernel_size
 
@@ -24,7 +24,7 @@ def mean_pooling(A, kernel_size, stride=None, padding=0):
     return A_w.mean(axis=(1, 2)).reshape(output_shape)
 
 
-def gradient(img, stride):
+def gradient(img, stride=2):
     rez = []
     for i in range(0, len(img) - stride - 1, stride):
         arr1 = img[i:i + stride]
@@ -51,7 +51,15 @@ def make_dataset(images, fun, features_len):
     for i, image in enumerate(images):
         im = image * 255
         features = fun(im)
-        if len(features.shape) > 1:
-            data[i] = features.flatten()
-        else:
+        if isinstance(features, list):
             data[i] = features
+        else:
+            data[i] = features.flatten()
+    return data
+
+
+def target_by_centers(data, centers):
+    target = np.zeros(len(data)).astype('int')
+    for i, feature in enumerate(data):
+        target[i] = np.argmin(np.mean(np.square(centers - feature), axis = 1))
+    return np.array(target)
