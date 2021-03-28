@@ -22,12 +22,12 @@ class Main(QWidget):
         self.iscrossvalidation.move(10, 50)
 
         self.table_label = QLabel(self)
-        self.table_label.setText("Лучшие результаты классификации")
-        self.table_label.setGeometry(130, 80, 200, 20)
+        self.table_label.setText("Лучшие результаты классификации на тестовой выборке")
+        self.table_label.setGeometry(90, 80, 200, 20)
 
         self.table = QTableWidget(6, 4, self)
         self.table.setGeometry(10, 100, 400, 250)
-        feature_names = ['Градиент', 'Scale', 'DCT', 'DFT', 'Гистограмма']
+        feature_names = ['Гистограмма', 'DFT', 'DCT', 'Scale', 'Градиент']
         column_names = ['Признак', 'Правильно', 'Неправильно', 'Точность']
         for c in range(4):
             item = QTableWidgetItem(column_names[c])
@@ -37,7 +37,7 @@ class Main(QWidget):
             self.table.setItem(r + 1, 0, item)
 
         self.show()
-        #self.work_process()
+        self.work_process()
 
     def work_process(self):
         data_images = fetch_olivetti_faces()
@@ -68,27 +68,28 @@ class Main(QWidget):
                 test_data.append([])
                 for c in range(classes):
                     if len(train_data[feature]) > 0:
-                        train_data[feature] = np.concatenate((train_data[feature], features_data[feature][c*10 + k:(c+1)*10]))
-                        test_data[feature] = np.concatenate((test_data[feature], features_data[feature][c*10 : c*10 + k]))
+                        test_data[feature] = np.concatenate((test_data[feature], features_data[feature][c*10 + k:(c+1)*10]))
+                        train_data[feature] = np.concatenate((train_data[feature], features_data[feature][c*10 : c*10 + k]))
                         if feature == 0:
-                            train_target = np.concatenate((train_target, target[c*10 + k:(c+1)*10]))
-                            test_target = np.concatenate((test_target, target[c*10 : c*10 + k]))
+                            test_target = np.concatenate((test_target, target[c*10 + k:(c+1)*10]))
+                            train_target = np.concatenate((train_target, target[c*10 : c*10 + k]))
                     else:
                         for arr in features_data[feature][c*10 + k:(c+1)*10]:
-                            train_data[feature].append(arr)
-                        for arr in features_data[feature][c*10 : c*10 + k]:
                             test_data[feature].append(arr)
+                        for arr in features_data[feature][c*10 : c*10 + k]:
+                            train_data[feature].append(arr)
                         if feature == 0:
-                            train_target = target[c*10 + k:(c+1)*10]
-                            test_target = target[c*10 : c*10 + k]
+                            test_target = target[c*10 + k:(c+1)*10]
+                            train_target = target[c*10 : c*10 + k]
             train_target = np.array(train_target)
+            test_target = np.array(test_target)
             pred_target = []
             for feature in range(5):
                 knn = KNN(n_neighbors=2)
                 knn.fit(train_data[feature], train_target)
                 pred_target.append(knn.predict(test_data[feature]))
-            loss = [np.sum(pred_target[feature] != test_target)/len(test_target) for feature in range(5)]
-            rez[:, k-1] = loss
+            acc = [np.sum(pred_target[feature] == test_target)/len(test_target) for feature in range(5)]
+            rez[:, k-1] = acc
             n = 0
             for i in range(2):
                 for j in range(3):
@@ -99,3 +100,11 @@ class Main(QWidget):
                     fig.show()
                 plt.pause(0.05)
         self.iscrossvalidation.setChecked(True)
+
+        for feature in range(5):
+            right_ans = np.sum(pred_target[feature] == test_target)
+            self.table.setItem(feature + 1, 1, QTableWidgetItem(str(right_ans)))
+            item = QTableWidgetItem(str(len(test_target) - right_ans))
+            self.table.setItem(feature + 1, 2, item)
+            item = QTableWidgetItem(str(round(right_ans / len(test_target), 3)))
+            self.table.setItem(feature + 1, 3, item)

@@ -24,7 +24,7 @@ def mean_pooling(A, kernel_size=4, stride=None, padding=0):
     return A_w.mean(axis=(1, 2)).reshape(output_shape)
 
 
-def gradient(img, stride=2):
+def gradient(img, stride=4):
     rez = []
     for i in range(0, len(img) - stride - 1, stride):
         arr1 = img[i:i + stride]
@@ -56,4 +56,3 @@ def make_dataset(images, fun, features_len):
         else:
             data[i] = features.flatten()
     return data
-    

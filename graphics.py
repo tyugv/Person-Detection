@@ -3,7 +3,7 @@ from feature_selection import *
 
 
 def show_features(image):
-    fig, axs = plt.subplots(2, 3, figsize=(10, 7))
+    fig, axs = plt.subplots(2, 3, figsize=(9, 8))
     axs[0, 0].imshow(image), axs[0, 0].set_title('Оригинал')
     axs[0, 1].plot(histogram(image)), axs[0, 1].set_title('Гистограмма')
     axs[0, 2].imshow(dft(image), cmap='gray'), axs[0, 2].set_title('DFT')
@@ -15,7 +15,7 @@ def show_features(image):
 
 def show_features_progress():
     titles = ['Градиент', 'Scale', 'DCT', 'DFT', 'Гистограмма']
-    fig, axs = plt.subplots(2, 3, figsize=(10, 7))
+    fig, axs = plt.subplots(2, 3, figsize=(9, 8))
     for i in range(2):
         for j in range(3):
             if i == 1 and j == 2:
