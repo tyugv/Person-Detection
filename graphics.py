@@ -14,12 +14,10 @@ def show_features(image):
 
 
 def show_features_progress():
-    titles = ['Градиент', 'Scale', 'DCT', 'DFT', 'Гистограмма']
+    titles = ['Мнение большинства', 'Градиент', 'Scale', 'DCT', 'DFT', 'Гистограмма']
     fig, axs = plt.subplots(2, 3, figsize=(9, 8))
     for i in range(2):
         for j in range(3):
-            if i == 1 and j == 2:
-                break
             axs[i, j].set_xlim(1, 9)
             axs[i, j].set_ylim(0, 1)
             axs[i, j].set_title(titles.pop())

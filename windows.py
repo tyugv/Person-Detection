@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QCheckBox, QWidget, QTableWidget, QTableWidgetItem, 
 import matplotlib.pyplot as plt
 from sklearn.datasets import fetch_olivetti_faces
 from sklearn.neighbors import KNeighborsClassifier as KNN
+from statistics import mode
 from feature_selection import *
 from graphics import show_features, show_features_progress
 
@@ -23,16 +24,16 @@ class Main(QWidget):
 
         self.table_label = QLabel(self)
         self.table_label.setText("Лучшие результаты классификации на тестовой выборке")
-        self.table_label.setGeometry(90, 80, 200, 20)
+        self.table_label.setGeometry(50, 80, 300, 20)
 
-        self.table = QTableWidget(6, 4, self)
-        self.table.setGeometry(10, 100, 400, 250)
-        feature_names = ['Гистограмма', 'DFT', 'DCT', 'Scale', 'Градиент']
+        self.table = QTableWidget(7, 4, self)
+        self.table.setGeometry(10, 100, 400, 300)
+        feature_names = ['Гистограмма', 'DFT', 'DCT', 'Scale', 'Градиент', 'Большинство']
         column_names = ['Признак', 'Правильно', 'Неправильно', 'Точность']
         for c in range(4):
             item = QTableWidgetItem(column_names[c])
             self.table.setItem(0, c, item)
-        for r in range(5):
+        for r in range(6):
             item = QTableWidgetItem(feature_names[r])
             self.table.setItem(r + 1, 0, item)
 
@@ -40,6 +41,14 @@ class Main(QWidget):
         self.work_process()
 
     def work_process(self):
+
+        def get_by_max_choice(pred_target):
+            preds = np.array(pred_target)
+            result_pred = []
+            for i in range(len(preds[0])):
+                result_pred.append(mode(preds[:, i]))
+            return result_pred
+
         data_images = fetch_olivetti_faces()
         images = data_images['images']
         target = data_images['target']
@@ -56,7 +65,7 @@ class Main(QWidget):
         self.isfeaturesgot.setChecked(True)
 
         fig, axs = show_features_progress()
-        rez = np.zeros((5, 9))     
+        rez = np.zeros((6, 9))     
         for k in range(1, 10):
             train_data = []
             train_target = []
@@ -88,20 +97,19 @@ class Main(QWidget):
                 knn = KNN(n_neighbors=2)
                 knn.fit(train_data[feature], train_target)
                 pred_target.append(knn.predict(test_data[feature]))
-            acc = [np.sum(pred_target[feature] == test_target)/len(test_target) for feature in range(5)]
+            pred_target.append(get_by_max_choice(pred_target))
+            acc = [np.sum(pred_target[feature] == test_target)/len(test_target) for feature in range(6)]
             rez[:, k-1] = acc
             n = 0
             for i in range(2):
                 for j in range(3):
-                    if i == 1 and j == 2:
-                        break
                     axs[i, j].plot(np.arange(1, k+1), rez[n, :k])
                     n+=1
                     fig.show()
                 plt.pause(0.05)
         self.iscrossvalidation.setChecked(True)
 
-        for feature in range(5):
+        for feature in range(6):
             right_ans = np.sum(pred_target[feature] == test_target)
             self.table.setItem(feature + 1, 1, QTableWidgetItem(str(right_ans)))
             item = QTableWidgetItem(str(len(test_target) - right_ans))
