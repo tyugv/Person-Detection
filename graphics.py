@@ -20,7 +20,7 @@ def show_features_progress():
         for j in range(3):
             if i == 1 and j == 2:
                 break
-            axs[i, j].set_xlim(1, 10)
+            axs[i, j].set_xlim(1, 9)
             axs[i, j].set_ylim(0, 1)
             axs[i, j].set_title(titles.pop())
     return fig, axs

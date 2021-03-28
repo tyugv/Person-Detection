@@ -56,10 +56,4 @@ def make_dataset(images, fun, features_len):
         else:
             data[i] = features.flatten()
     return data
-
-
-def target_by_centers(data, centers):
-    target = np.zeros(len(data)).astype('int')
-    for i, feature in enumerate(data):
-        target[i] = np.argmin(np.mean(np.square(centers - feature), axis = 1))
-    return np.array(target)
+    
