@@ -18,7 +18,8 @@ def show_features_progress():
     fig, axs = plt.subplots(2, 3, figsize=(9, 8))
     for i in range(2):
         for j in range(3):
-            axs[i, j].set_xlim(1, 9)
+            axs[i, j].set_xlim(1*39, 9*39)
+            axs[i, j].set_xticks(np.linspace(1*39, 9*39, 6).astype('int'))
             axs[i, j].set_ylim(0, 1)
             axs[i, j].set_title(titles.pop())
     return fig, axs
